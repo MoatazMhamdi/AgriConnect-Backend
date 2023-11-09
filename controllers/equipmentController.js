@@ -1,58 +1,63 @@
-import equipment from "../models/equipment.js";
+import Equipment from "../models/equipment.js";
 import { validationResult } from 'express-validator';
 
 /**
- * ajout d'un menu
+ * Adding a piece of equipment
  * @param {*} req 
  * @param {*} res 
- * @returns cle
+ * @returns equipment object
  */
 export function createEquipment(req, res) {
-    if (!validationResult(req).isEmpty()) {
-        return res.status(400).json({ errors: validationResult(req).array() });
-    } else {
-        equipment.create({
-            nom: req.body.nom,
-            paysOrigine: req.body.paysOrigine,
-        }).then((newEquipment) => res.status(201).json({ 
-            nom: newEquipment.nom, 
-            paysOrigine: newEquipment.paysOrigine }))
-            .catch((err) => {
-                res.status(500).json({ error: err });
-            });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
+
+    const { name, image, categorie, description } = req.body;
+
+    Equipment.create({
+        name,
+        image,
+        categorie,
+        description
+    })
+    .then(newEquipment => {
+        res.status(201).json(newEquipment);
+    })
+    .catch(err => {
+        res.status(500).json({ error: err.message });
+    });
 }
+
 /**
- * affichage de tous les equipments
+ * Displaying all pieces of equipment
  * @param {*} req 
  * @param {*} res 
  */
 export function getAll(req, res) {
-    equipment.find({})
-        .then((equipements) => {
-            res.status(200).json(equipements.map((equipment) => {
-                return {
-                    _id: equipment._id,
-                    nom: equipment.nom,
-                }
-            }));
+    Equipment.find({})
+        .then(equipments => {
+            res.status(200).json(equipments);
         })
-        .catch((err) => {
-            res.status(500).json({ error: err });
+        .catch(err => {
+            res.status(500).json({ error: err.message });
         });
 }
 
 /**
- * affichage d'un equipment a partir de son id
+ * Displaying a piece of equipment by its ID
  * @param {*} req 
  * @param {*} res 
  */
 export function getOne(req, res) {
-    equipment.findOne({ "_id": req.params.id })
-        .then((equipment) => {
+    Equipment.findById(req.params.id)
+        .then(equipment => {
+            if (!equipment) {
+                return res.status(404).json({ error: "Equipment not found" });
+            }
             res.status(200).json(equipment);
         })
-        .catch((err) => {
-            res.status(500).json({ error: err });
+        .catch(err => {
+            res.status(500).json({ error: err.message });
         });
 }

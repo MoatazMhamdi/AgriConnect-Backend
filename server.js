@@ -30,7 +30,7 @@ app.use(cors()); //security
 app.use(morgan('dev')); //statut fel terminal 
 app.use(express.json()); // bch yjm ya9ra json
 
-app.use('/equipments', equipmentRoutes);//bch yjib les routes mt3 menu
+app.use('/equipments', equipmentRoutes);//bch yjib les routes mt3 equipement
 
 app.use(notFoundError); // bch yjib erreur 404
 app.use(errorHandler); // bch yjib erreur 500

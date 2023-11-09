@@ -5,14 +5,17 @@ import { body } from "express-validator";
 const router = express.Router();
 
 /**
- * declaration des routes equipment
+ * Declaration of equipment routes
  */
 router
     .route("/")
     .post(
-        body("nom").isLength({ min: 3, max: 30 }),
-        body("paysOrigine").isLength({ min: 3, max: 30 }),
-        createEquipment)
+        body("name").isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
+        body("image").isURL().withMessage('Image must be a valid URL'),
+        body("categorie").isLength({ min: 3 }).withMessage('Categorie must be at least 3 characters long'),
+        body("description").isLength({ min: 5 }).withMessage('Description must be at least 5 characters long'),
+        createEquipment
+    )
     .get(getAll);
 
 router
@@ -20,6 +23,6 @@ router
     .get(getOne);
 
 /**
- * export du router
+ * Export the router
  */
 export default router;
