@@ -1,9 +1,9 @@
-const { verifySignUp } = require("../middlewares");
-const controller = require("../controllers/auth.controller");
+import { verifySignUp } from "../middlewares/index.js";
+import { signup, signin } from "../controllers/auth.controller.js";
 
-module.exports = function(app) {
+export default function(app) {
   app.use(function(req, res, next) {
-    res.header(
+    res.setHeader(
       "Access-Control-Allow-Headers",
       "x-access-token, Origin, Content-Type, Accept"
     );
@@ -16,8 +16,8 @@ module.exports = function(app) {
       verifySignUp.checkDuplicateUsernameOrEmail,
       verifySignUp.checkRolesExisted
     ],
-    controller.signup
+    signup
   );
 
-  app.post("/api/auth/signin", controller.signin);
-};
+  app.post("/api/auth/signin", signin);
+}

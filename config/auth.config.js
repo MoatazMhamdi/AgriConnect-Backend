@@ -1,3 +1,2 @@
-module.exports = {
-    secret: "esprim-secret-key"
-  };
+const secret = "esprim-secret-key";
+export { secret };

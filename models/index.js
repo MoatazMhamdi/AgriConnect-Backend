@@ -1,5 +1,5 @@
-const dbConfig = require("../config/db.config.js");
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import { url } from "../config/db.config.js";
 
 mongoose.Promise = global.Promise;
 
@@ -7,11 +7,12 @@ const db = {};
 
 db.mongoose = mongoose;
 
-db.user = require("./user.model");
-db.role = require("./role.model");
-db.url = dbConfig.url;
+import "./user.model.js";
+import role from "./role.model.js";
+db.role = role;
 
+db.url = url;
 
 db.ROLES = ["user", "admin", "farmer"];
 
-module.exports = db;
+export default db;

@@ -1,24 +1,25 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import { json, urlencoded } from "express";
+import db from "./models/index.js";
+import Role from "./models/role.model.js";
+import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 
-var corsOptions = {
+const corsOptions = {
   origin: "http://localhost:3000"
 };
 
 app.use(cors(corsOptions));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
-// parse requests of content-type - application/json
-app.use(express.json());
-
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
-const db = require("./models");
-const Role = db.role;
+const role = db.role;
 
 db.mongoose
-  .connect( db.url, {
+  .connect(db.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -31,7 +32,7 @@ db.mongoose
     process.exit();
   });
 
-  function initial() {
+function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       new Role({
@@ -67,14 +68,13 @@ db.mongoose
   });
 }
 
-// simple route
 app.get("/", (req, res) => {
   res.json({ message: "hello ." });
 });
-require('./routes/auth.routes')(app);
-require('./routes/user.routes')(app);
 
-// set port, listen for requests
+authRoutes(app);
+userRoutes(app);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
