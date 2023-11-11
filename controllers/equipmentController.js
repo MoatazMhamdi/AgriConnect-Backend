@@ -13,13 +13,14 @@ export function createEquipment(req, res) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, image, categorie, description } = req.body;
+    const { name, image, categorie, description, etat } = req.body;
 
     Equipment.create({
         name,
         image,
         categorie,
-        description
+        description,
+        etat
     })
     .then(newEquipment => {
         res.status(201).json(newEquipment);
@@ -61,3 +62,53 @@ export function getOne(req, res) {
             res.status(500).json({ error: err.message });
         });
 }
+/**
+ * Deleting a piece of equipment by its ID
+ * @param {*} req 
+ * @param {*} res 
+ */
+export function deleteEquipment(req, res) {
+    Equipment.findByIdAndDelete(req.params.id)
+        .then(deletedEquipment => {
+            if (!deletedEquipment) {
+                return res.status(404).json({ error: "Equipment not found" });
+            }
+            res.status(200).json({ message: "Equipment successfully deleted" });
+        })
+        .catch(err => {
+            res.status(500).json({ error: err.message });
+        });
+}
+
+
+/**
+ * Updating a piece of equipment by its ID
+ * @param {*} req 
+ * @param {*} res 
+ * @returns updated equipment object
+ */
+export function updateEquipment(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, image, categorie, description, etat } = req.body;
+
+    Equipment.findByIdAndUpdate(
+        req.params.id,
+        { name, image, categorie, description, etat },
+        { new: true, runValidators: true } // options
+    )
+    .then(updatedEquipment => {
+        if (!updatedEquipment) {
+            return res.status(404).json({ error: "Equipment not found" });
+        }
+        res.status(200).json(updatedEquipment);
+    })
+    .catch(err => {
+        res.status(500).json({ error: err.message });
+    });
+}
+
+

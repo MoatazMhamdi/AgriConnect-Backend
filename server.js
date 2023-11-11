@@ -5,6 +5,8 @@ import cors from "cors";
 import { notFoundError } from "./middlewares/error-handler.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import equipmentRoutes from "./routes/equipmentRoutes.js";
+import maintenanceRoutes from "./routes/mainteanceRoutes.js";
+import enchereRoutes from "./routes/enchereRoutes.js";
 
 
 
@@ -31,6 +33,8 @@ app.use(morgan('dev')); //statut fel terminal
 app.use(express.json()); // bch yjm ya9ra json
 
 app.use('/equipments', equipmentRoutes);//bch yjib les routes mt3 equipement
+app.use('/maintenances', maintenanceRoutes);//bch yjib les routes mt3 maintenance
+app.use('/encheres', enchereRoutes);//bch yjib les routes mt3 enchere
 
 app.use(notFoundError); // bch yjib erreur 404
 app.use(errorHandler); // bch yjib erreur 500

@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
 const equipmentSchema = new Schema({
-  
   name: {
     type: String,
     required: true
@@ -19,10 +18,11 @@ const equipmentSchema = new Schema({
   description: {
     type: String,
     required: true
+  },
+  etat: { 
+    type: String,
+    required: true
   }
-},
-{
-  timestamps: true,
 });
 
 export default model("Equipment", equipmentSchema);
