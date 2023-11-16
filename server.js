@@ -1,81 +1,56 @@
-import express from "express";
-import cors from "cors";
-import { json, urlencoded } from "express";
-import db from "./models/index.js";
-import Role from "./models/role.model.js";
-import authRoutes from "./routes/auth.routes.js";
-import userRoutes from "./routes/user.routes.js";
+import  express  from 'express'; // Importer express
+import mongoose from 'mongoose'; // Importer Mongoose
+import morgan from 'morgan';
 
-const app = express();
 
-const corsOptions = {
-  origin: "http://localhost:3000"
-};
+import userRoutes from './routes/user.js';
+import cookieParser from 'cookie-parser';
 
-app.use(cors(corsOptions));
-app.use(json());
-app.use(urlencoded({ extended: true }));
 
-const role = db.role;
+import cors from 'cors'
 
-db.mongoose
-  .connect(db.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+const hostname = '127.0.0.1';
+const app =express();
+const port = process.env.port || 9090;
+const databaseName = 'AgriConnect';
+
+// Cela afichera les requêtes MongoDB dans le terminal
+mongoose.set('debug', true);
+// Utilisation des promesses ES6 pour Mongoose, donc aucune callback n'est nécessaire
+mongoose.Promise = global.Promise;
+
+// Se connecter à MongoDB
+mongoose
+  .connect(`mongodb://127.0.0.1:27017/${databaseName}`)
   .then(() => {
-    console.log("Successfully connect to MongoDB.");
-    initial();
+    // Une fois connecté, afficher un message de réussite sur la console
+    console.log(`Connected to ${databaseName}`);
   })
   .catch(err => {
-    console.error("Connection error", err);
-    process.exit();
+    // Si quelque chose ne va pas, afficher l'erreur sur la console
+    console.log(err);
   });
 
-function initial() {
-  Role.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      new Role({
-        name: "user"
-      }).save(err => {
-        if (err) {
-          console.log("error", err);
-        }
+  app.use(cors());
+app.use(express.json());
+app.use(morgan("dev"));
+app.use(cookieParser());
 
-        console.log("added 'user' to roles collection");
-      });
 
-      new Role({
-        name: "farmer"
-      }).save(err => {
-        if (err) {
-          console.log("error", err);
-        }
+app.use('/users',userRoutes);
+app.get("/logout", (req, res) => {
+  res.cookie("jwt", "", { maxAge: "1" })
+  res.status(201).json({ message: 'successfully logged out ' })
+})
 
-        console.log("added 'Farmer' to roles collection");
-      });
+/**
+ * Démarrer le serveur à l'écoute des connexions
+ */
+app.listen(port, hostname,() => {
+    console.log(`Server running at http://${hostname}:${port}/`);
 
-      new Role({
-        name: "admin"
-      }).save(err => {
-        if (err) {
-          console.log("error", err);
-        }
+})
 
-        console.log("added 'admin' to roles collection");
-      });
-    }
+  app.listen(port, () => {
+    console.log(`Serveur démarré sur le port ${port}`);
   });
-}
-
-app.get("/", (req, res) => {
-  res.json({ message: "hello ." });
-});
-
-authRoutes(app);
-userRoutes(app);
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
