@@ -22,8 +22,9 @@ const EchangeSchema = new Schema({
   description: String,
   dateEchange: {
     type: Date,
-    required: true,
-  },
-});
+    required: true,}
+},
+
+{timestamps: true});;
 
 export default model("Echange", EchangeSchema);

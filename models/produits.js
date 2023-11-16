@@ -17,7 +17,10 @@ const ProduitSchema = new Schema({
     type: Number,
     required: true,
   },
-  dateRecolte: Date,
+  dateRecolte: {
+    type: String,
+    required: true
+  },
   proprietaire: {
     type: Schema.Types.ObjectId,
     ref: "Ferme", // Reference to the "Ferme" model 

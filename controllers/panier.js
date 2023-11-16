@@ -1,4 +1,6 @@
+import panier from "../models/panier.js";
 import Panier from "../models/panier.js";
+import produits from "../models/produits.js";
 // Add a product to the shopping cart
 export async function addToPanier(req, res) {
     try {
@@ -12,14 +14,14 @@ export async function addToPanier(req, res) {
 
 // Get shopping cart items for a specific user
 export async function getPanierItems(req, res) {
-  try {
-    const { utilisateurId } = req.params;
-    const panierItems = await Panier.find({ utilisateur: utilisateurId }).populate("Produit");
-    res.status(200).json(panierItems);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+    try {
+      const { utilisateurId } = req.params;
+      const panierItems = await Panier.find({ utilisateur: utilisateurId }).populate('produit');
+      res.status(200).json(panierItems);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   }
-}
 
 // Update a shopping cart item by ID
 export async function updatePanierItem(req, res) {

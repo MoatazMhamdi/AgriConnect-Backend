@@ -27,9 +27,7 @@ const CommandeSchema = new Schema({
     type: Date,
     required: true,
   },
-}, 
-{
-    timestamps:true 
+
 });
 
 export default model("Commande", CommandeSchema);

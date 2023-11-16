@@ -44,31 +44,31 @@ export async function updateCommande(req, res) {
 }
 
 //delete an order
+// Delete an exchange by ID within the first 2 days
 export async function deleteCommande(req, res) {
-    try {
-       const existingCommande = await Commande.findById(req.params.id);
-     
-       if (!existingCommande) {
-         return res.status(404).json({ message: 'command not found' });
-       }
-       const twoDaysInMillis = 2 * 24 * 60 * 60 * 1000; // Two days in milliseconds
-       const currentTime = new Date().getTime();
-       const commandeTime = existingCommande.createdAt.getTime();
+  try {
+    const { id } = req.params;
+    const existingCommande = await Commande.findById(id);
 
-       if(currentTime-commandeTime >twoDaysInMillis)
-       return res.status(400).send({ message: 'Désolé, la commande ne peut pas être annulée! Les 2 jours sont passés' });
-      
-     const deletedCommand = await Commande.findByIdAndDelete({_id:req.params.id})
-     deletedCommand ?
-     res.status(200).send({success:{msg:"commande supprimée avec succes",deletedCommand}})
-     :
-     res.status(404).json({errors:{message:'Suppression echoué'}})
-
-
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    if (!existingCommande) {
+      return res.status(404).json({ message: 'commande not found' });
     }
+
+    const twoDaysInMillis = 2 * 24 * 60 * 60 * 1000; // Two days in milliseconds
+    const currentTime = new Date().getTime();
+    const CommandeTime = existingCommande.dateCommande.getTime();
+
+    if (currentTime - CommandeTime > twoDaysInMillis) {
+      return res.status(400).json({ message: 'Désolé, la commande ne peut pas être annulée! Les 2 jours sont passés' });
+    }
+
+    await Commande.findByIdAndRemove(id);
+    res.status(204).end();
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
+}
+
 
 // Get a list of all orders
 export async function getCommandes(req, res) {
