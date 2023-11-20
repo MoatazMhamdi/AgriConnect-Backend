@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
       type: String, 
       required: true },
     numTel: { 
-      type: Number, 
+      type: String, 
       required: true ,
       unique:true },
    
