@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 
-import { FarmerSignUp , login ,ProfilePicUpload ,ClientSignUp, getAllUsers, ProfileEdit } from '../controllers/user.js';
+import { FarmerSignUp , login ,ProfilePicUpload ,ClientSignUp, getAllUsers, ProfileEdit, forgetPasssword, verifyOtp, resetPassword,sendOTP  } from '../controllers/user.js';
  import { auth, authAdminSup ,authClient ,authFarmer } from '../middlewares/auth.js'; 
 
 
@@ -16,6 +16,20 @@ router
   .post(FarmerSignUp);
 
 
+  router
+  .route('/sendOTP')
+  .post(sendOTP)
+
+router
+  .route('/forgetPassword')
+  .post(forgetPasssword)
+
+  router
+  .route('/resetPassword')
+  .post(resetPassword)
+router
+  .route('/verifyOTP')
+  .post(verifyOtp)
 
 
   router
@@ -32,7 +46,7 @@ router
 
 router
   .route('/AllUsers')
-  .get(authAdminSup,getAllUsers)
+  .get(authClient,getAllUsers)
 
 router
   .route('/editProfile')

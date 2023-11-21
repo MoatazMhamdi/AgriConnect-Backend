@@ -3,6 +3,9 @@ import User from '../models/user.js' ;
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import upload from '../middlewares/multerConfig.js'
+import otpGenerator from 'otp-generator';
+import Otp from '../models/otp.js';
+import { sendEmail } from '../utils/mailSender.js';
 
 
 
@@ -86,6 +89,8 @@ export async function ClientSignUp(req,res,next){
 
         role: 'Client',
       });
+      sendEmail(req.body.email,'Welcome to HealthLink',pwd)
+
   
       await user.save();
 
@@ -122,9 +127,7 @@ export function login(req, res, next) {
                           Secure: true,
                       });
 
-                      res.status(200).json({
-                          userId: user._id,
-                          message: "User successfully Logged in",
+                      res.status(200).json({user
                       });
                   }
               })
@@ -137,6 +140,111 @@ export function login(req, res, next) {
           console.error('Error in User.findOne:', error);
           res.status(500).json({ error: 'Internal Server Error' });
       });
+}
+
+export async function sendOTP(req,res,next){
+  try {
+    const existingUser = await User.findOne(
+      { numTel: req.body.numTel },
+    );
+
+    if (existingUser) {
+      return res.status(400).json({ message: "It seems you already have an account, please log in instead." });
+    }
+    const otp = otpGenerator.generate(6,{
+      secret: process.env.JWT_SECRET,
+      digits: 6,
+      algorithm: 'sha256',
+      epoch: Date.now(),
+      upperCaseAlphabets: false, specialChars: false,
+      lowerCaseAlphabets: false,
+  });
+        const otpDocument = new Otp({
+            userId: req.body.numTel, 
+            otp
+        });
+
+        await otpDocument.save();
+        res.status(200).json({ otp : otpDocument });
+
+} catch (error) {
+    console.error('Error generating OTP:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+}
+}
+export async function forgetPasssword(req,res,next){
+  try{
+    User.findOne({ numTel: req.body.numTel })
+    .then(user => {
+        if (!user) {
+            return res.status(401).json({ message: 'User is not registered' });
+        }
+        const otp = otpGenerator.generate(6,{
+          secret: process.env.JWT_SECRET,
+          digits: 6,
+          algorithm: 'sha256',
+          epoch: Date.now(),
+          upperCaseAlphabets: false, specialChars: false,
+          lowerCaseAlphabets: false,
+      });
+      const otpDocument = new Otp({
+        userId: req.body.numTel, 
+        otp,
+      });
+       otpDocument.save();
+      return res.status(200).json({otp})
+        
+      })
+  }
+      catch(error) {
+        console.error('Error in User.findOne:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    };
+}
+
+export async function verifyOtp(req, res, next) {
+  try {
+    const { numTel, otp } = req.body;
+    const otpDocument = await Otp.findOne({ userId: numTel });
+
+    if (!otpDocument) {
+      return res.status(404).json({ error: 'OTP not found' });
+    }
+
+    // Verify the OTP
+    if (otp === otpDocument.otp) {
+      // Delete the OTP document
+      await otpDocument.deleteOne();
+
+      return res.status(200).json({ message: 'OTP verified' });
+    } else {
+      return res.status(401).json({ error: 'Invalid OTP' });
+    }
+  } catch (error) {
+    console.error('Error in verifyOtp:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+export async function resetPassword(req,res,next){
+  try {
+ 
+    const hash = await bcrypt.hash(req.body.newPassword, 10);
+  
+    const user = await User.findOneAndUpdate(
+      { numTel: req.body.numTel },
+      { password: hash },
+      { new: true } 
+      );             
+      if (!user) {
+       return res.status(404).json({ error: 'User not found' });
+       }
+                     
+      return res.status(200).json({ message: 'Password changed !', user });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
 
 export async function ProfileEdit(req, res, next) {
