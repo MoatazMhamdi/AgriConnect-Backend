@@ -1,6 +1,8 @@
 import Equipment from "../models/equipment.js";
 import { validationResult } from 'express-validator';
 
+
+
 /**
  * Adding a piece of equipment
  * @param {*} req 
@@ -13,22 +15,32 @@ export function createEquipment(req, res) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, image, categorie, description, etat } = req.body;
+    const { name, categorie, description, etat } = req.body;
+    const image = req.file.path; // Chemin du fichier téléchargé
 
-    Equipment.create({
-        name,
-        image,
-        categorie,
-        description,
-        etat
-    })
-    .then(newEquipment => {
-        res.status(201).json(newEquipment);
-    })
-    .catch(err => {
-        res.status(500).json({ error: err.message });
-    });
+    try {
+        Equipment.create({
+            name,
+            image,
+            categorie,
+            description,
+            etat
+        })
+        .then(newEquipment => {
+            res.status(201).json(newEquipment);
+        })
+        .catch(err => {
+            console.error("Erreur lors de la création de l'équipement:", err);
+            // Affichez un message d'erreur à l'utilisateur ou effectuez une action appropriée ici.
+            res.status(500).json({ error: err.message });
+        });
+    } catch (error) {
+        console.error("Erreur lors de la création de l'équipement:", error);
+        // Affichez un message d'erreur à l'utilisateur ou effectuez une action appropriée ici.
+        res.status(500).json({ error: error.message });
+    }
 }
+
 
 /**
  * Displaying all pieces of equipment

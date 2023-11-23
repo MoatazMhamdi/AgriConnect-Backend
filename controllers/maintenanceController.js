@@ -80,3 +80,16 @@ export const getAllMaintenanceRecords = (req, res) => {
         .then(maintenanceRecords => res.status(200).json(maintenanceRecords))
         .catch(err => res.status(500).json({ error: err.message }));
 };
+// Get maintenance records by equipment ID
+export const getMaintenanceByEquipmentId = (req, res) => {
+    const equipmentId = req.params.equipmentId;
+
+    Maintenance.find({ ID_Equipement: equipmentId })
+        .then(maintenanceRecords => {
+            if (maintenanceRecords.length === 0) {
+                return res.status(404).json({ error: "No maintenance records found for this equipment" });
+            }
+            res.status(200).json(maintenanceRecords);
+        })
+        .catch(err => res.status(500).json({ error: err.message }));
+};

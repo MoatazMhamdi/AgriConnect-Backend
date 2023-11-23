@@ -32,6 +32,7 @@ app.use(cors()); //security
 app.use(morgan('dev')); //statut fel terminal 
 app.use(express.json()); // bch yjm ya9ra json
 
+app.use('/uploads', express.static('uploads'));
 app.use('/equipments', equipmentRoutes);//bch yjib les routes mt3 equipement
 app.use('/maintenances', maintenanceRoutes);//bch yjib les routes mt3 maintenance
 app.use('/encheres', enchereRoutes);//bch yjib les routes mt3 enchere
