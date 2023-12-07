@@ -1,56 +1,56 @@
-import  express  from 'express'; // Importer express
-import mongoose from 'mongoose'; // Importer Mongoose
-import morgan from 'morgan';
+import express from "express";
+import mongoose from "mongoose";
+import morgan from "morgan";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
+import userRoutes from './routes/userRoutes.js';
+import equipmentRoutes from "./routes/equipmentRoutes.js";
+import maintenanceRoutes from "./routes/mainteanceRoutes.js";
+import enchereRoutes from "./routes/enchereRoutes.js";
+import blogRoutes from './routes/blogRoutes.js';
+import reclamationRoutes from './routes/reclamationRoutes.js';
+import commandeRoutes from './routes/commandeRoutes.js';
+import produitRoutes from './routes/produitsRoutes.js';
+import panierRoutes from './routes/panierRoutes.js';
+import farmRoutes from './routes/farmRoutes.js';
+import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
 
-import userRoutes from './routes/user.js';
-import cookieParser from 'cookie-parser';
-
-
-import cors from 'cors'
-
-const hostname = '127.0.0.1';
-const app =express();
-const port = process.env.port || 9090;
+const app = express();
+const PORT = process.env.PORT || 9090;
 const databaseName = 'AgriConnect';
+const db_url = 'mongodb://localhost:27017';
 
-// Cela afichera les requêtes MongoDB dans le terminal
 mongoose.set('debug', true);
-// Utilisation des promesses ES6 pour Mongoose, donc aucune callback n'est nécessaire
 mongoose.Promise = global.Promise;
+mongoose.connect(`${db_url}/${databaseName}`)
+  .then(() => console.log(`Connected to ${databaseName}`))
+  .catch(err => console.log(err));
 
-// Se connecter à MongoDB
-mongoose
-  .connect(`mongodb://127.0.0.1:27017/${databaseName}`)
-  .then(() => {
-    // Une fois connecté, afficher un message de réussite sur la console
-    console.log(`Connected to ${databaseName}`);
-  })
-  .catch(err => {
-    // Si quelque chose ne va pas, afficher l'erreur sur la console
-    console.log(err);
-  });
-
-  app.use(cors());
+app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
-app.use(morgan("dev"));
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
+app.use('/users', userRoutes);
+app.use('/uploads', express.static('uploads'));
+app.use('/equipments', equipmentRoutes);
+app.use('/maintenances', maintenanceRoutes);
+app.use('/encheres', enchereRoutes);
+app.use('/blog', blogRoutes);
+app.use('/reclamation', reclamationRoutes);
+app.use('/commandes', commandeRoutes);
+app.use('/produits', produitRoutes);
+app.use('/panier', panierRoutes);
+app.use('/farm', farmRoutes);
 
-app.use('/users',userRoutes);
 app.get("/logout", (req, res) => {
   res.cookie("jwt", "", { maxAge: "1" })
-  res.status(201).json({ message: 'successfully logged out ' })
-})
+  res.status(201).json({ message: 'successfully logged out' })
+});
 
-/**
- * Démarrer le serveur à l'écoute des connexions
- */
-app.listen(port, hostname,() => {
-    console.log(`Server running at http://${hostname}:${port}/`);
+app.use(notFoundError);
+app.use(errorHandler);
 
-})
-
-  app.listen(port, () => {
-    console.log(`Serveur démarré sur le port ${port}`);
-  });
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,0 +1,33 @@
+import mongoose from "mongoose";
+
+const { Schema, model } = mongoose;
+
+const equipmentSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  image: {
+    type: String,
+    required: true
+  },
+  categorie: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  etat: { 
+    type: String,
+    required: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+});
+
+export default model("Equipment", equipmentSchema);
