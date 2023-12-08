@@ -166,7 +166,7 @@ export async function sendOTP(req,res,next){
             otp
         });
 
-        await otpDocument.save();
+         otpDocument.save();
         res.status(200).json({ otp : otpDocument });
 
 } catch (error) {
