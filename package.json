@@ -39,6 +39,6 @@
     "scheduler": "^0.23.0",
     "speakeasy": "^2.0.0",
     "stripe": "^14.4.0",
-    "twilio": "^4.19.0"
+    "twilio": "^4.19.3"
   }
 }
