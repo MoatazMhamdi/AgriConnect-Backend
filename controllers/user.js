@@ -7,7 +7,7 @@ import otpGenerator from 'otp-generator';
 import Otp from '../models/otp.js';
 import { sendEmail } from '../utils/mailSender.js';
 import { sendSMS } from '../utils/smsSender.js';
-
+import twilio from 'twilio';
 
 
 
@@ -90,7 +90,7 @@ export async function ClientSignUp(req,res,next){
 
         role: 'Client',
       });
-      sendEmail(req.body.email,'Welcome to HealthLink',pwd)
+      //sendEmail(req.body.email,'Welcome to HealthLink',pwd)
 
   
       await user.save();
@@ -212,34 +212,59 @@ export async function sendOTP(req,res,next){
 }
 
 
-export async function forgetPasssword(req,res,next){
-  try{
-    User.findOne({ numTel: req.body.numTel })
-    .then(user => {
-        if (!user) {
-            return res.status(401).json({ message: 'User is not registered' });
-        }
-        const otp = otpGenerator.generate(6,{
-          secret: process.env.JWT_SECRET,
-          digits: 6,
-          algorithm: 'sha256',
-          epoch: Date.now(),
-          upperCaseAlphabets: false, specialChars: false,
-          lowerCaseAlphabets: false,
-      });
-      const otpDocument = new Otp({
-        userId: req.body.numTel, 
-        otp,
-      });
-       otpDocument.save();
-      return res.status(200).json({otp})
-        
-      })
+export async function forgetPasssword(req, res, next) {
+  try {
+    // Extract numTel from the request body
+    const { numTel } = req.body;
+
+    // Check if the user is registered
+    const user = await User.findOne({ numTel });
+
+    if (!user) {
+      return res.status(401).json({ message: 'User is not registered' });
+    }
+
+    // Generate OTP
+    const otp = otpGenerator.generate(6, {
+      secret: process.env.JWT_SECRET,
+      digits: 6,
+      algorithm: 'sha256',
+      epoch: Date.now(),
+      upperCaseAlphabets: false,
+      specialChars: false,
+      lowerCaseAlphabets: false,
+    });
+
+    // Save OTP in the database
+    const otpDocument = new Otp({
+      userId: numTel,
+      otp,
+    });
+    await otpDocument.save();
+    const accountSid = 'AC9d4b7d841fb0a5618ea1a79695c8867f';
+    const authToken = '740b5769d3d72229cdf4ccce6dccdafe';
+    const twilioPhoneNumber = '+12057404893';
+
+    const client = twilio(accountSid, authToken);
+    
+    const phoneNumberE164  ="+216" + req.body.numTel
+
+    console.log('Sending SMS to:', phoneNumberE164);
+    // Send SMS using Twilio
+    const message = await client.messages.create({
+      body: `Your OTP is: ${otp}`,
+      from: twilioPhoneNumber,
+      to: phoneNumberE164,
+    });
+
+    console.log(`SMS sent with SID: ${message.sid}`);
+   // sendSMS(numTel, otp);
+
+    return res.status(200).json({ otp });
+  } catch (error) {
+    console.error('Error in forgetPasssword:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
-      catch(error) {
-        console.error('Error in User.findOne:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    };
 }
 
 export async function verifyOtp(req, res, next) {
