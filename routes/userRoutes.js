@@ -6,7 +6,11 @@ const router = express.Router();
 
 
 
+<<<<<<< Updated upstream
 import { FarmerSignUp , login ,ProfilePicUpload ,ClientSignUp, getAllUsers, ProfileEdit, forgetPasssword, verifyOtp, resetPassword,sendOTP } from '../controllers/userController.js';
+=======
+import { FarmerSignUp , login ,ProfilePicUpload ,ClientSignUp,AdminSupSignUp, getAllUsers, ProfileEdit, forgetPasssword, verifyOtp, resetPassword,sendOTP, deleteUserByNumTel } from '../controllers/userController.js';
+>>>>>>> Stashed changes
  import { auth, authAdminSup ,authClient ,authFarmer } from '../middlewares/auth.js'; 
 
 
@@ -30,6 +34,12 @@ router
   .route('/verifyOTP')
   .post(verifyOtp)
 
+<<<<<<< Updated upstream
+=======
+  router
+  .route('/AdminSignup')
+  .post(AdminSupSignUp);
+>>>>>>> Stashed changes
 
   router
   .route('/ClientSignup')
@@ -47,10 +57,25 @@ router
   .route('/AllUsers')
   .get(authAdminSup,getAllUsers)
 
+<<<<<<< Updated upstream
+=======
+  router
+  .route('/AllUser')
+  .get(getAllUsers)
+
+>>>>>>> Stashed changes
 router
   .route('/editProfile')
   .patch(auth,ProfileEdit)
 
+<<<<<<< Updated upstream
+=======
+  router
+  .route('/:numTel')
+  .delete(deleteUserByNumTel);
+
+
+>>>>>>> Stashed changes
 
 
  export default  router;

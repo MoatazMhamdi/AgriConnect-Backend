@@ -6,7 +6,12 @@ import upload from '../middlewares/multerConfig.js'
 import otpGenerator from 'otp-generator';
 import Otp from '../models/otp.js';
 import { sendEmail } from '../utils/mailSender.js';
+<<<<<<< Updated upstream
 
+=======
+import { sendSMS } from '../utils/smsSender.js';
+import twilio from 'twilio';
+>>>>>>> Stashed changes
 
 
 
@@ -89,6 +94,10 @@ export async function ClientSignUp(req,res,next){
 
         role: 'Client',
       });
+<<<<<<< Updated upstream
+=======
+      //sendEmail(req.body.email,'Welcome to HealthLink',pwd)
+>>>>>>> Stashed changes
 
   
       await user.save();
@@ -100,7 +109,44 @@ export async function ClientSignUp(req,res,next){
   }
 
 };
+<<<<<<< Updated upstream
   
+=======
+export async function AdminSupSignUp(req,res,next){
+  try {
+    const hash = await bcrypt.hash(req.body.password, 10);
+
+    const existingUser = await User.findOne(
+    { numTel: req.body.numTel },
+    );
+
+    if (existingUser) {
+      return res.status(400).json({ message: "It seems you already have an account, please log in instead." });
+    }
+
+  
+      const user = new User({
+        name: req.body.name,
+        email: req.body.email,
+        password: hash,
+        numTel: req.body.numTel,
+ 
+
+        role: 'AdminSup',
+      });
+      //sendEmail(req.body.email,'Welcome to HealthLink',pwd)
+
+  
+      await user.save();
+
+      return res.status(200).json({ message: 'Admin created' });
+    
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+};
+>>>>>>> Stashed changes
 
 export function login(req, res, next) {
   User.findOne({ numTel: req.body.numTel })
@@ -128,7 +174,11 @@ export function login(req, res, next) {
 
                       res.status(200).json({
                           userId: user._id,
+<<<<<<< Updated upstream
                           message: "User successfully Logged in",
+=======
+                          message: "User successfully Logged in", user
+>>>>>>> Stashed changes
                       });
                   }
               })
@@ -165,14 +215,22 @@ export async function sendOTP(req,res,next){
             otp
         });
 
+<<<<<<< Updated upstream
         await otpDocument.save();
         res.status(200).json({ otp : otpDocument });
+=======
+         otpDocument.save();
+       /*  const Tnumtel ="+216" + req.body.numTel
+        sendSMS(Tnumtel,otp)*/
+        res.status(200).json({ message: "OTP Sent"});
+>>>>>>> Stashed changes
 
 } catch (error) {
     console.error('Error generating OTP:', error);
     res.status(500).json({ error: 'Internal Server Error' });
 }
 }
+<<<<<<< Updated upstream
 export async function forgetPasssword(req,res,next){
   try{
     User.findOne({ numTel: req.body.numTel })
@@ -201,6 +259,63 @@ export async function forgetPasssword(req,res,next){
         console.error('Error in User.findOne:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     };
+=======
+
+
+export async function forgetPasssword(req, res, next) {
+  try {
+    // Extract numTel from the request body
+    const { numTel } = req.body;
+
+    // Check if the user is registered
+    const user = await User.findOne({ numTel });
+
+    if (!user) {
+      return res.status(401).json({ message: 'User is not registered' });
+    }
+
+    // Generate OTP
+    const otp = otpGenerator.generate(6, {
+      secret: process.env.JWT_SECRET,
+      digits: 6,
+      algorithm: 'sha256',
+      epoch: Date.now(),
+      upperCaseAlphabets: false,
+      specialChars: false,
+      lowerCaseAlphabets: false,
+    });
+
+    // Save OTP in the database
+    const otpDocument = new Otp({
+      userId: numTel,
+      otp,
+    });
+    await otpDocument.save();
+    const accountSid = 'AC9d4b7d841fb0a5618ea1a79695c8867f';
+    const authToken = '740b5769d3d72229cdf4ccce6dccdafe';
+    const twilioPhoneNumber = '+12057404893';
+
+    const client = twilio(accountSid, authToken);
+    
+    const phoneNumberE164  ="+216" + req.body.numTel
+
+    console.log('Sending SMS to:', phoneNumberE164);
+    // Send SMS using Twilio
+    const message = await client.messages.create({
+      body: `Your OTP is: ${otp}`,
+      from: twilioPhoneNumber,
+      to: phoneNumberE164,
+    });
+
+    console.log(`SMS sent with SID: ${message.sid}`);
+   // sendSMS(numTel, otp);
+
+    return res.status(200).json({ otp });
+  } catch (error) {
+    console.error('Error in forgetPasssword:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+>>>>>>> Stashed changes
 }
 
 export async function verifyOtp(req, res, next) {
@@ -271,6 +386,34 @@ export async function ProfileEdit(req, res, next) {
     return res.status(500).json({ error: 'Failed to update profile' });
   }
 }
+<<<<<<< Updated upstream
+=======
+export async function deleteUserByNumTel(req, res, next) {
+  try {
+    const numTel = req.params.numTel; // Extract numTel from route parameter
+
+    console.log('Attempting to delete user with numTel:', numTel);
+
+    // Find the user by numTel
+    const userToDelete = await User.findOne({ numTel });
+
+    if (!userToDelete) {
+      console.log('User not found for numTel:', numTel);
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Delete the user
+    await userToDelete.deleteOne();
+
+    console.log('User deleted successfully:', userToDelete);
+    res.json({ message: 'User deleted successfully', user: userToDelete });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+>>>>>>> Stashed changes
 
 export async function getAllUsers(req,res,next){
   try {
@@ -292,4 +435,58 @@ function generatePassword() {
     } 
     return password; 
 } 
+<<<<<<< Updated upstream
   
+=======
+/*const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+
+const client = twilio(accountSid, authToken);
+
+export function forgotPasswordSMS(req, res) {
+  const { numTel } = req.body;
+
+  // Generate an OTP (e.g., a 6-digit code)
+  const otpCode = otpGenerator.generate(6, { upperCase: false, specialChars: false });
+
+  // Set the expiration time for the OTP (e.g., 10 minutes)
+  const otpExpiration = Date.now() + 600000;
+
+  // Update the user's otpCode and otpExpiration in the database
+  User.findOneAndUpdate(
+      { numTel },
+      { otpCode, otpExpiration },
+      { new: true }
+  )
+  .then(user => {
+      if (!user) {
+          return res.status(404).json({ error: 'User not found.' });
+      }
+
+      // Log the updated user data
+      console.log('Updated User Data:', user);
+
+      // Ensure the phone number is in the E.164 format
+      const phoneNumberE164 = `+21625049802`;  // Replace with the user's phone number field
+      console.log('Sending SMS to:', phoneNumberE164);
+
+      // Use Twilio to send the OTP via SMS
+      client.messages.create({
+          body: `Your OTP for password reset is: ${otpCode}`,
+          from: twilioPhoneNumber,
+          to: phoneNumberE164,
+      })
+      .then(() => {
+          res.status(200).json({ message: 'Reset OTP sent to your phone.' });
+      })
+      .catch(error => {
+          console.error('Error sending SMS:', error);
+          res.status(500).json({ error: 'Error sending OTP via SMS.' });
+      });
+  })
+  .catch(error => {
+      res.status(500).json({ error: error.message });
+  });
+}*/
+>>>>>>> Stashed changes

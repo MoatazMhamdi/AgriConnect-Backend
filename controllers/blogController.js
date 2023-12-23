@@ -2,6 +2,10 @@
 import Blog from '../models/blog.js';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+<<<<<<< Updated upstream
+=======
+import { upload } from '../middlewares/multer-config.js';
+>>>>>>> Stashed changes
 
 export function createBlog(req, res) {
   const errors = validationResult(req);
@@ -15,7 +19,14 @@ export function createBlog(req, res) {
   let image;
 
   if (req.file) {
+<<<<<<< Updated upstream
     image = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+=======
+    
+    image = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+   // console.log('Received file:', file);
+
+>>>>>>> Stashed changes
   }
 
   const newBlog = new Blog({
@@ -38,7 +49,23 @@ export function createBlog(req, res) {
     .catch(error => {
       res.status(400).json({ error: error.message });
     });
+<<<<<<< Updated upstream
 }
+=======
+    
+}
+
+export function getAllBlogs(req, res) {
+  Blog.find()
+    .then(blogs => {
+      res.status(200).json(blogs);
+    })
+    .catch(error => {
+      res.status(400).json({ error: error.message });
+    });
+}
+
+>>>>>>> Stashed changes
     export function getBlog(req, res) {
       const blogId = req.params.blog;
     
@@ -100,6 +127,10 @@ export function createBlog(req, res) {
           .catch(error => {
             res.status(400).json({ error: error.message });
           });
+<<<<<<< Updated upstream
       }
 
     
+=======
+      }
+>>>>>>> Stashed changes

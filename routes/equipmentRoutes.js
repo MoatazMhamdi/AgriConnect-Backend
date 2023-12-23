@@ -28,7 +28,7 @@ router.post(
   body("name").isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
   body("categorie").isLength({ min: 3 }).withMessage('Categorie must be at least 3 characters long'),
   body("description").isLength({ min: 5 }).withMessage('Description must be at least 5 characters long'),
-  body("etat").isLength({ min: 5 }).withMessage('Etat must be at least 5 characters long'),
+  body("etat").isLength({ min: 3 }).withMessage('Etat must be at least 5 characters long'),
   createEquipment
 );
 
@@ -45,6 +45,12 @@ router.put('/:id',
 upload.single('image'),  
 updateEquipment);
 
+<<<<<<< Updated upstream
+=======
+router.put('/sansImage/:id', 
+updateEquipment);
+
+>>>>>>> Stashed changes
 router.get('/user/:userId', getEquipmentByUserId);
 
 /**
