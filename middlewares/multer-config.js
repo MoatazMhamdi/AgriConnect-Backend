@@ -1,24 +1,18 @@
-// middlewares/multer-config.js
+// Dans multer-config.js
+
 import multer from 'multer';
 
-
 const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, 'images'); // le dossier où les images seront stockées
+  destination: function (req, file, cb) {
+    cb(null, './images/');
   },
-  filename: (req, file, callback) => {
-    callback(null, Date.now() + '-' + file.originalname);
-  },
+  filename: function (req, file, cb) {
+    const fileExt = file.originalname.split('.').pop();
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + '.' + fileExt);
+  }
 });
 
-const fileFilter = (req, file, callback) => {
-  if (file.mimetype.startsWith('image/')) {
-    callback(null, true);
-  } else {
-    callback(new Error('Invalid file type. Only images are allowed.'));
-  }
-};
+const upload = multer({ storage: storage });
 
-const upload = multer({ storage: storage, fileFilter: fileFilter });
-
-export default upload.single('image'); // Utilisez upload.single pour la gestion d'un seul fichier
+export { upload };

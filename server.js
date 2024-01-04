@@ -14,6 +14,8 @@ import commandeRoutes from './routes/commandeRoutes.js';
 import produitRoutes from './routes/produitsRoutes.js';
 import panierRoutes from './routes/panierRoutes.js';
 import farmRoutes from './routes/farmRoutes.js';
+import commentRoutes from './routes/comment.js'; // Assurez-vous que le chemin est correct
+
 import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
 
 const app = express();
@@ -45,6 +47,7 @@ app.use('/commandes', commandeRoutes);
 app.use('/produits', produitRoutes);
 app.use('/panier', panierRoutes);
 app.use('/farm', farmRoutes);
+app.use('/comments', commentRoutes);
 
 
 app.use('/images', express.static('images'));
