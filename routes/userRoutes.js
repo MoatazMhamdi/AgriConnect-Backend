@@ -6,11 +6,7 @@ const router = express.Router();
 
 
 
-<<<<<<< Updated upstream
-import { FarmerSignUp , login ,ProfilePicUpload ,ClientSignUp, getAllUsers, ProfileEdit, forgetPasssword, verifyOtp, resetPassword,sendOTP } from '../controllers/userController.js';
-=======
-import { FarmerSignUp , login ,ProfilePicUpload ,ClientSignUp,AdminSupSignUp, getAllUsers, ProfileEdit, forgetPasssword, verifyOtp, resetPassword,sendOTP, deleteUserByNumTel } from '../controllers/userController.js';
->>>>>>> Stashed changes
+import { FarmerSignUp , login ,ProfilePicUpload ,ClientSignUp,AdminSupSignUp,  getAllUsers, ProfileEdit, forgetPasssword, verifyOtp,banUser,unbanUser, resetPassword,sendOTP,updateUserUsername, updateEmail,updatePassword,UpdateNumTel } from '../controllers/userController.js';
  import { auth, authAdminSup ,authClient ,authFarmer } from '../middlewares/auth.js'; 
 
 
@@ -33,13 +29,9 @@ router
 router
   .route('/verifyOTP')
   .post(verifyOtp)
-
-<<<<<<< Updated upstream
-=======
   router
   .route('/AdminSignup')
   .post(AdminSupSignUp);
->>>>>>> Stashed changes
 
   router
   .route('/ClientSignup')
@@ -53,29 +45,33 @@ router
   .route('/updatePicture')
   .patch(authFarmer,ProfilePicUpload);
 
-router
-  .route('/AllUsers')
-  .get(authAdminSup,getAllUsers)
-
-<<<<<<< Updated upstream
-=======
   router
-  .route('/AllUser')
+  .route('/AllUsers')
   .get(getAllUsers)
 
->>>>>>> Stashed changes
-router
-  .route('/editProfile')
-  .patch(auth,ProfileEdit)
-
-<<<<<<< Updated upstream
-=======
   router
-  .route('/:numTel')
-  .delete(deleteUserByNumTel);
+  .route('/banUser/:id')
+  .post(banUser);
+  router
+  .route('/UnbanUser/:id')
+  .post( unbanUser);
 
+router
+  .route('/editProfile/:id')
+  .patch(ProfileEdit)
 
->>>>>>> Stashed changes
+  router
+  .route('/editName/:id')
+  .patch(updateUserUsername)
+  router
+  .route('/editEmail/:id')
+  .patch(updateEmail)
+  router
+  .route('/editPassword/:id')
+  .patch(updatePassword)
+  router
+  .route('/editNumTel/:id')
+  .patch(UpdateNumTel)
 
 
  export default  router;

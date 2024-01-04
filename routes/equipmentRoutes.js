@@ -45,12 +45,11 @@ router.put('/:id',
 upload.single('image'),  
 updateEquipment);
 
-<<<<<<< Updated upstream
-=======
+
 router.put('/sansImage/:id', 
 updateEquipment);
 
->>>>>>> Stashed changes
+
 router.get('/user/:userId', getEquipmentByUserId);
 
 /**

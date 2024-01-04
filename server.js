@@ -19,11 +19,11 @@ import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
 const app = express();
 const PORT = process.env.PORT || 9090;
 const databaseName = 'AgriConnect';
-const db_url = 'mongodb://localhost:27017';
+const db_url = 'mongodb://127.0.0.1:27017';
 
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
-mongoose.connect(`${db_url}/${databaseName}`)
+mongoose.connect(`mongodb://127.0.0.1:27017/${databaseName}`)
   .then(() => console.log(`Connected to ${databaseName}`))
   .catch(err => console.log(err));
 
@@ -39,22 +39,17 @@ app.use('/equipments', equipmentRoutes);
 app.use('/maintenances', maintenanceRoutes);
 app.use('/encheres', enchereRoutes);
 app.use('/blog', blogRoutes);
-<<<<<<< Updated upstream
-=======
 app.use('/api', blogRoutes);
->>>>>>> Stashed changes
 app.use('/reclamation', reclamationRoutes);
 app.use('/commandes', commandeRoutes);
 app.use('/produits', produitRoutes);
 app.use('/panier', panierRoutes);
 app.use('/farm', farmRoutes);
-<<<<<<< Updated upstream
 
-=======
+
 app.use('/images', express.static('images'));
 
 
->>>>>>> Stashed changes
 app.get("/logout", (req, res) => {
   res.cookie("jwt", "", { maxAge: "1" })
   res.status(201).json({ message: 'successfully logged out' })

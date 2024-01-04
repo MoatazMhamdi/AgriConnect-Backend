@@ -6,12 +6,8 @@ import upload from '../middlewares/multerConfig.js'
 import otpGenerator from 'otp-generator';
 import Otp from '../models/otp.js';
 import { sendEmail } from '../utils/mailSender.js';
-<<<<<<< Updated upstream
-
-=======
 import { sendSMS } from '../utils/smsSender.js';
 import twilio from 'twilio';
->>>>>>> Stashed changes
 
 
 
@@ -94,10 +90,7 @@ export async function ClientSignUp(req,res,next){
 
         role: 'Client',
       });
-<<<<<<< Updated upstream
-=======
       //sendEmail(req.body.email,'Welcome to HealthLink',pwd)
->>>>>>> Stashed changes
 
   
       await user.save();
@@ -109,9 +102,6 @@ export async function ClientSignUp(req,res,next){
   }
 
 };
-<<<<<<< Updated upstream
-  
-=======
 export async function AdminSupSignUp(req,res,next){
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
@@ -146,10 +136,9 @@ export async function AdminSupSignUp(req,res,next){
   }
 
 };
->>>>>>> Stashed changes
 
 export function login(req, res, next) {
-  User.findOne({ numTel: req.body.numTel })
+  User.findOne({ name: req.body.name })
       .then(user => {
           if (!user) {
               return res.status(401).json({ message: 'User is not registered' });
@@ -174,11 +163,8 @@ export function login(req, res, next) {
 
                       res.status(200).json({
                           userId: user._id,
-<<<<<<< Updated upstream
                           message: "User successfully Logged in",
-=======
-                          message: "User successfully Logged in", user
->>>>>>> Stashed changes
+                          jwt: token,
                       });
                   }
               })
@@ -192,7 +178,6 @@ export function login(req, res, next) {
           res.status(500).json({ error: 'Internal Server Error' });
       });
 }
-
 export async function sendOTP(req,res,next){
   try {
     const existingUser = await User.findOne(
@@ -215,51 +200,16 @@ export async function sendOTP(req,res,next){
             otp
         });
 
-<<<<<<< Updated upstream
-        await otpDocument.save();
-        res.status(200).json({ otp : otpDocument });
-=======
          otpDocument.save();
        /*  const Tnumtel ="+216" + req.body.numTel
         sendSMS(Tnumtel,otp)*/
         res.status(200).json({ message: "OTP Sent"});
->>>>>>> Stashed changes
 
 } catch (error) {
     console.error('Error generating OTP:', error);
     res.status(500).json({ error: 'Internal Server Error' });
 }
 }
-<<<<<<< Updated upstream
-export async function forgetPasssword(req,res,next){
-  try{
-    User.findOne({ numTel: req.body.numTel })
-    .then(user => {
-        if (!user) {
-            return res.status(401).json({ message: 'User is not registered' });
-        }
-        const otp = otpGenerator.generate(6,{
-          secret: process.env.JWT_SECRET,
-          digits: 6,
-          algorithm: 'sha256',
-          epoch: Date.now(),
-          upperCaseAlphabets: false, specialChars: false,
-          lowerCaseAlphabets: false,
-      });
-      const otpDocument = new Otp({
-        userId: req.body.numTel, 
-        otp,
-      });
-       otpDocument.save();
-      return res.status(200).json({otp})
-        
-      })
-  }
-      catch(error) {
-        console.error('Error in User.findOne:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    };
-=======
 
 
 export async function forgetPasssword(req, res, next) {
@@ -315,7 +265,6 @@ export async function forgetPasssword(req, res, next) {
     console.error('Error in forgetPasssword:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
->>>>>>> Stashed changes
 }
 
 export async function verifyOtp(req, res, next) {
@@ -365,10 +314,10 @@ export async function resetPassword(req,res,next){
 
 export async function ProfileEdit(req, res, next) {
   try {
-    const authenticatedId = req.auth.userId;
-    const userId = req.body.userId; 
+    //const authenticatedId = req.auth.userId;
+    const userId = req.params.userId; 
 
-    if (authenticatedId !== userId) {
+    if (userId !== userId) {
       return res.status(403).json({ error: 'Permission denied. You can only edit your own profile.' });
     }
     User.findByIdAndUpdate(userId, req.body, { new: true, useFindAndModify: false })
@@ -386,8 +335,6 @@ export async function ProfileEdit(req, res, next) {
     return res.status(500).json({ error: 'Failed to update profile' });
   }
 }
-<<<<<<< Updated upstream
-=======
 export async function deleteUserByNumTel(req, res, next) {
   try {
     const numTel = req.params.numTel; // Extract numTel from route parameter
@@ -412,9 +359,79 @@ export async function deleteUserByNumTel(req, res, next) {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 }
+export async function updateUserUsername(req, res) {
+  try {
+      const userId = req.params.id;
+      const { name } = req.body;
 
->>>>>>> Stashed changes
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
 
+      user.name = name;
+      const updatedUser = await user.save();
+
+      res.status(200).json(updatedUser);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}
+
+export async function updateEmail(req, res) {
+  try {
+      const userId = req.params.id;
+      const { email } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      user.email = email;
+      const updatedUser = await user.save();
+
+      res.status(200).json(updatedUser);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}
+export async function updatePassword(req, res) {
+  try {
+      const userId = req.params.id;
+      const { password } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      user.password = password;
+      const updatedUser = await user.save();
+
+      res.status(200).json(updatedUser);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}
+export async function UpdateNumTel(req, res) {
+  try {
+      const userId = req.params.id;
+      const { numTel } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      user.numTel = numTel;
+      const updatedUser = await user.save();
+
+      res.status(200).json(updatedUser);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}
 export async function getAllUsers(req,res,next){
   try {
     const Users = await User.find().exec();
@@ -424,7 +441,41 @@ export async function getAllUsers(req,res,next){
     console.error(error);
 }
 }
+export async function banUser(req, res) {
+  try {
+    const userId = req.params.id;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
+    user.isBanned = true;
+    const bannedUser = await user.save();
+    res.status(200).json(bannedUser);
+    console.log("user is banned", user)
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+export async function unbanUser(req, res) {
+  try {
+    const userId = req.params.id;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.isBanned = false;
+    const unbannedUser = await user.save();
+
+    res.status(200).json(unbannedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 function generatePassword() { 
     var length = 8, 
         charset =  
@@ -435,9 +486,6 @@ function generatePassword() {
     } 
     return password; 
 } 
-<<<<<<< Updated upstream
-  
-=======
 /*const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
@@ -489,4 +537,3 @@ export function forgotPasswordSMS(req, res) {
       res.status(500).json({ error: error.message });
   });
 }*/
->>>>>>> Stashed changes
